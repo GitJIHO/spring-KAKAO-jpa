@@ -3,6 +3,7 @@ package gift.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import gift.entity.User;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +30,11 @@ class UserRepositoryTest {
     void findByEmailTest() {
         User user = new User("test@abc.com", "password");
         User actual = userRepository.save(user);
-        User expected = userRepository.findByEmail(user.getEmail()).orElse(null);
+        Optional<User> expected = userRepository.findByEmail(user.getEmail());
 
         assertThat(actual.getId()).isNotNull();
-        assertThat(actual.samePassword(expected.getPassword())).isTrue();
+        assertThat(expected).isPresent();
+        assertThat(actual.samePassword(expected.get().getPassword())).isTrue();
     }
 
     @Test

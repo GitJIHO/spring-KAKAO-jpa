@@ -30,7 +30,7 @@ public class ProductController {
     }
 
     @GetMapping
-    public Page<Product> getProduct(@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public Page<Product> getProduct(@PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return productService.getAllProducts(pageable);
     }
 
@@ -46,11 +46,10 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> changeProduct(@PathVariable("id") Long id,
+    public ResponseEntity<Product> changeProduct(@PathVariable("id") Long id,
         @Valid @RequestBody ProductRequest productRequest) {
-        productService.updateProduct(id, productRequest);
-        return ResponseEntity.ok("수정되었습니다.");
-            productRequest.getImg());
+        Product product = productService.updateProduct(id, productRequest);
+        return ResponseEntity.ok(product);
     }
 
     @DeleteMapping("/{id}")

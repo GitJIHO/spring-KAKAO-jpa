@@ -33,10 +33,11 @@ public class ProductService {
         return product;
     }
 
-    public void updateProduct(Long id, ProductRequest productRequest) {
+    public Product updateProduct(Long id, ProductRequest productRequest) {
         Product product = new Product(id, productRequest.getName(), productRequest.getPrice(),
             productRequest.getImg());
         productRepository.save(product);
+        return product;
     }
 
     public void deleteProduct(Long id) {

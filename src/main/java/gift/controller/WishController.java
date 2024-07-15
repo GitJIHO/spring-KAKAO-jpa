@@ -38,7 +38,7 @@ public class WishController {
     }
 
     @GetMapping
-    public Page<Wish> getWishes(@LoginUser User user, @PageableDefault(size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+    public Page<Wish> getWishes(@LoginUser User user, @PageableDefault(sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         return wishService.getWishes(user.getId(), pageable);
     }
 

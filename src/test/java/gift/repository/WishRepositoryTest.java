@@ -2,10 +2,9 @@ package gift.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import gift.entity.Product;
-import gift.entity.User;
 import gift.entity.Wish;
 import jakarta.persistence.EntityManager;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +30,7 @@ class WishRepositoryTest {
 
         assertThat(page.getTotalElements()).isEqualTo(30);
         assertThat(page.getTotalPages()).isEqualTo(3);
-        assertThat(page.getContent().size()).isEqualTo(10);
+        assertThat(page.getContent()).hasSize(10);
 
         assertThat(page.getContent().get(0).getProduct().getName()).isEqualTo("Product 1");
     }
@@ -40,23 +39,29 @@ class WishRepositoryTest {
     @Test
     @DisplayName("유저 아이디와 위시 아이디 기반 위시 객체 반환 테스트")
     void findByUserIdAndId() {
-        Wish expectedWish = wishRepository.findById(1L).orElseThrow();
-        Wish actualWish = wishRepository.findByUserIdAndId(1L, 1L).orElse(null);
+        Optional<Wish> expectedWish = wishRepository.findById(1L);
+        Optional<Wish> actualWish = wishRepository.findByUserIdAndId(1L, 1L);
 
-        assertThat(expectedWish.getId()).isEqualTo(actualWish.getId());
-        assertThat(expectedWish.getProduct().getId()).isEqualTo(actualWish.getProduct().getId());
+        assertThat(actualWish).isPresent();
+        assertThat(expectedWish).isPresent().hasValueSatisfying(
+            w -> assertThat(w.getId()).isEqualTo(actualWish.get().getId()));
+        assertThat(expectedWish).hasValueSatisfying(
+            w -> assertThat(w.getProduct().getName()).isEqualTo(
+                actualWish.get().getProduct().getName()));
     }
 
     @Test
     @DisplayName("updateWishNumber JPQL 테스트")
     void updateWishNumber() {
-        Wish wish = wishRepository.findById(1L).orElseThrow();
-        wishRepository.updateWishNumber(1L, wish.getId(), 30);
+        Optional<Wish> wish = wishRepository.findById(1L);
+        assertThat(wish).isPresent();
+        wishRepository.updateWishNumber(1L, wish.get().getId(), 30);
         entityManager.flush();
         entityManager.clear();
 
-        Wish updatedWish = wishRepository.findByUserIdAndId(1L, wish.getId()).orElse(null);
+        Optional<Wish> updatedWish = wishRepository.findByUserIdAndId(1L, wish.get().getId());
 
-        assertThat(updatedWish.getNumber()).isEqualTo(30);
+        assertThat(updatedWish).isPresent().hasValueSatisfying(
+            w -> assertThat(w.getNumber()).isEqualTo(30));
     }
 }

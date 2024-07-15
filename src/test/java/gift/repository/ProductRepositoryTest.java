@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import gift.entity.Product;
 import jakarta.validation.ConstraintViolationException;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,11 +33,11 @@ class ProductRepositoryTest {
     @Test
     @DisplayName("DB에 저장된 ID를 기반으로 저장된 객체를 불러오는지 테스트")
     void findByIdTest() {
-        Long id = 1L; // data.sql에 정의된 첫 번째 제품의 ID
-        Product actual = productRepository.findById(id).orElse(null);
+        Long First_Product_id = 1L;
+        Optional<Product> actual = productRepository.findById(First_Product_id);
 
-        assertThat(actual).isNotNull();
-        assertThat(actual.getName()).isEqualTo("Product 1");
+        assertThat(actual).isPresent().hasValueSatisfying(
+            w -> assertThat(w.getName()).isEqualTo("Product 1"));
     }
 
     @Test
@@ -57,7 +58,7 @@ class ProductRepositoryTest {
 
         assertThat(page.getTotalElements()).isEqualTo(30);
         assertThat(page.getTotalPages()).isEqualTo(3);
-        assertThat(page.getContent().size()).isEqualTo(10);
+        assertThat(page.getContent()).hasSize(10);
 
         assertThat(page.getContent().get(0).getName()).isEqualTo("Product 1");
     }
